@@ -12,6 +12,8 @@ services:
       MYSQL_PASSWORD: ecommerce
     volumes:
       - db_data:/var/lib/mysql
+      # mount initial schema file - executed automatically on first startup
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "3306:3306"
 
