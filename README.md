@@ -196,6 +196,66 @@ url: https://swapnilbamble1438.github.io/EcommerceApplication/
 
 - INSERT INTO product VALUES (5,'sonysmart',50000,1,'sonywatch.webp',2,4),(6,'GalaxyBook',45000,1,'samsunglaptop.jpg',1,1),(7,'smarttv',28000,1,'onidatv.jpg',5,2),(8,'smartphone',15000,1,'lenovomobile.webp',3,3),(9,'aspire',52000,1,'acerlaptop.jpg',4,1),(10,'Braviass',52,1,'sonytv.jpg',2,2),(11,'GalaxyWatch',22000,1,'galaxywatch.webp',1,4),(14,'kdl',45000,1,'sony kdl.jpg',2,2),(15,'series a7',21000,1,'acer series a7.jpg',4,2),(17,'leo',31000,1,'onida leo.jpg',5,2),(18,'crystal',42000,1,'samsung crystal.webp',1,2),(19,'Aspire 7',55000,1,'acer aspire7.jpg',4,1),(20,'ideapad',37000,1,'lenovo ideapad.jpg',3,1),(21,'legion',51000,1,'lenovo legion.jpg',3,1),(22,'Galaxy Z Fold3',66000,1,'Galaxy z fold3.jpg',1,3),(23,'Galaxy S22',55000,1,'Samsung galaxy s22.webp',1,3),(24,'Xperia 1v',56000,1,'sony xperia 1v.jpg',2,3),(26,'A850',14500,1,'lenovo a850.jpg',3,3),(27,'Galaxy watch1',8000,1,'galaxy watch.jpg',1,4),(28,'Galaxy Watch2',95000,1,'galaxy watch4.jpg',1,4),(29,'Smart Fit',11000,1,'smart fit.jpg',3,4),(30,'Sony Smart2',12000,1,'sony smart2.webp',2,4),(31,'Gaming Predator',120000,1,'Acer Predator.jpg',4,1),(32,'Liquid',16000,1,'Acer liquid.jpg',4,3),(33,'Neo QLED',46000,1,'Samsung neo Qled.webp',1,2),(34,'VAIO',53000,1,'Sony Vaio.jpg',2,1),(35,'Xperia Z',32000,1,'sonyxperiaz.png',2,3);
 
+### Containerization & Deployment 🚀
+
+The application is now container‑friendly. Two services are defined in `docker-compose.yml`:
+
+1. **db** – a MySQL 8 instance with persistent volume `db_data`.
+2. **app** – the Java webapp built with Maven and run in Tomcat.
+
+You can still run the embedded SQLite database by leaving `DB_URL` unset; it will default to `jdbc:sqlite:/data/mydatabase.db`.
+
+#### Building and running locally
+
+```bash
+# from project root (EcommerceApp/EcommerceApp)
+docker-compose build        # builds both images
+docker-compose up -d        # start services in background
+```
+
+The web UI will be available on `http://localhost:8080`.
+
+#### Overriding configuration
+
+Use environment variables on the app service:
+
+| Variable  | Purpose                              | Default (without compose)                    |
+|-----------|--------------------------------------|----------------------------------------------|
+| `DB_URL`  | JDBC URL for database               | `jdbc:sqlite:/data/mydatabase.db`            |
+| `DB_USER` | username for MySQL                  | none                                         |
+| `DB_PASS` | password for MySQL                  | none                                         |
+
+You may mount `./data` to persist the SQLite file or any application data.
+
+#### Deploying to AWS EC2
+
+1. **Provision instance** – choose an Amazon Linux 2/Ubuntu AMI and open ports 22, 8080 and 3306 (if you need remote DB access).
+2. **Install Docker & Docker Compose**:
+   ```bash
+   sudo yum update -y           # or apt-get on Ubuntu
+   sudo amazon-linux-extras install docker -y
+   sudo service docker start
+   sudo usermod -a -G docker ec2-user
+   sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
+3. **Copy project** – clone your repository or scp the code to the instance.
+4. **Build & run** (same commands as local):
+   ```bash
+   cd EcommerceApp/EcommerceApp
+   docker-compose build
+   docker-compose up -d
+   ```
+5. **Access** – navigate to `http://<ec2-public-ip>:8080`.
+
+> ✅ *Tip:* to update, rebuild the app image on the instance or push to a registry and use `docker-compose pull`.
+
+The database data is stored in a Docker volume on the instance (`db_data`) and is persistent across restarts.
+
+---
+
+Feel free to adapt the `docker-compose.yml` to use other SQL engines (PostgreSQL, etc.) by adjusting `DB_URL`. The code will automatically pick up the JDBC URL and credentials from the environment.
+
 
 
 
