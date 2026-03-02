@@ -222,6 +222,7 @@ Use environment variables on the app service:
 | Variable  | Purpose                              | Default (without compose)                    |
 |-----------|--------------------------------------|----------------------------------------------|
 | `DB_URL`  | JDBC URL for database               | `jdbc:sqlite:/data/mydatabase.db`            |
+|           | include `?allowPublicKeyRetrieval=true` when using the default MySQL 8 auth plugin or running in Docker to avoid a "Public Key Retrieval is not allowed" error |
 | `DB_USER` | username for MySQL                  | none                                         |
 | `DB_PASS` | password for MySQL                  | none                                         |
 

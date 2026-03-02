@@ -26,7 +26,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_URL: jdbc:mysql://db:3306/ecommerce?useSSL=false&serverTimezone=UTC
+      # include allowPublicKeyRetrieval when using sha256_password or caching_sha2_password
+      DB_URL: jdbc:mysql://db:3306/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       DB_USER: ecommerce
       DB_PASS: ecommerce
     volumes:
