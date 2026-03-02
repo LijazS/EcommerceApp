@@ -1,0 +1,21 @@
+docker run -d \
+  --name ecommerce_db \
+  --network ecommerce-net \
+  -e MYSQL_ROOT_PASSWORD=rootpassword \
+  -e MYSQL_DATABASE=ecommerce \
+  -e MYSQL_USER=ecommerce \
+  -e MYSQL_PASSWORD=ecommerce \
+  -v ecommerce_db_data:/var/lib/mysql \
+  -v "$(pwd)/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro" \
+  -p 3306:3306 \
+  mysql:8.0
+
+
+docker run -d \
+  --name ecommerce_app \
+  --network ecommerce-net \
+  -e DB_URL="jdbc:mysql://ecommerce_db:3306/ecommerce?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
+  -e DB_USER=ecommerce \
+  -e DB_PASS=ecommerce \
+  -p 8080:8080 \
+  ecommerce-app
